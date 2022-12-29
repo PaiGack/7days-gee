@@ -1,28 +1,21 @@
 package main
 
 import (
+	"Gee/gee"
 	"fmt"
 	"log"
 	"net/http"
 )
 
-type Engine struct{}
-
-func (engine *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/":
+func main() {
+	r := gee.New()
+	r.GET("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
-	case "/hello":
+	})
+	r.GET("/hello", func(w http.ResponseWriter, r *http.Request) {
 		for k, v := range r.Header {
 			fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
 		}
-	default:
-		fmt.Fprintf(w, "404 NOT FOUND: %q\n", r.URL.Path)
-	}
-}
-
-func main() {
-	engine := Engine{}
-	log.Printf("Server Listing :9999")
-	log.Fatal(http.ListenAndServe(":9999", &engine))
+	})
+	log.Fatal(r.Run(":9999"))
 }
