@@ -1,7 +1,26 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
 
 func main() {
-	fmt.Println("Hello 7Days Gee")
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/hello", helloHandler)
+	log.Printf("Server Listing :9999")
+	log.Fatal(http.ListenAndServe(":9999", nil))
+}
+
+// handler echoes r.URL.Path
+func indexHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "URL.Path = %q\n", req.URL.Path)
+}
+
+// handler echoes r.URL.Header
+func helloHandler(w http.ResponseWriter, req *http.Request) {
+	for k, v := range req.Header {
+		fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
+	}
 }
