@@ -6,21 +6,23 @@ import (
 	"net/http"
 )
 
-func main() {
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/hello", helloHandler)
-	log.Printf("Server Listing :9999")
-	log.Fatal(http.ListenAndServe(":9999", nil))
-}
+type Engine struct{}
 
-// handler echoes r.URL.Path
-func indexHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "URL.Path = %q\n", req.URL.Path)
-}
-
-// handler echoes r.URL.Header
-func helloHandler(w http.ResponseWriter, req *http.Request) {
-	for k, v := range req.Header {
-		fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
+func (engine *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch r.URL.Path {
+	case "/":
+		fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
+	case "/hello":
+		for k, v := range r.Header {
+			fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
+		}
+	default:
+		fmt.Fprintf(w, "404 NOT FOUND: %q\n", r.URL.Path)
 	}
+}
+
+func main() {
+	engine := Engine{}
+	log.Printf("Server Listing :9999")
+	log.Fatal(http.ListenAndServe(":9999", &engine))
 }
